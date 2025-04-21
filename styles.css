@@ -1,0 +1,237 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: url('https://images.pexels.com/photos/159298/gears-cogs-machine-machinery-159298.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center/cover;
+    background-attachment: fixed; /* Ensures the background stays fixed while scrolling */
+    padding-top: 56px; /* Offset for fixed navbar */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+header .logo h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+}
+
+.search-bar button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+#home {
+    background: url('hero.jpg') no-repeat center center/cover;
+    padding: 100px 0;
+}
+
+#hero {
+    background: url('hero.jpg') no-repeat center center/cover;
+    color: #fff;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+#hero .hero-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#hero h2 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+#hero p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+#hero .btn {
+    background-color: #ff6600;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+#products {
+    padding: 20px;
+    text-align: center;
+}
+
+#products h2 {
+    margin-bottom: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.product-card h3 {
+    margin: 10px 0;
+}
+
+.product-card button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#about, #contact {
+    padding: 20px;
+    text-align: center;
+}
+
+#contact form {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+#contact label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#contact input, #contact textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#contact button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+footer {
+    background: rgba(0, 0, 0, 0.8); /* Semi-transparent black background for footer */
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+footer .social-links {
+    margin-top: 10px;
+}
+
+footer .social-links a {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer .social-links a:hover {
+    color: #007bff;
+}
+
+#products .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#products .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+#products .card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+#contact-form .btn {
+    background-color: #007bff;
+    border: none;
+}
+
+.hero-section {
+    background: rgba(0, 0, 0, 0.5) url('https://images.pexels.com/photos/159298/gears-cogs-machine-machinery-159298.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center/cover;
+    background-blend-mode: darken; /* Darkens the background image for better text visibility */
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+#products, #about, #contact {
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for content sections */
+    padding: 80px 0; /* Increased padding for better spacing */
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+/* Animations */
+.animate__animated {
+    animation-duration: 1s;
+} 

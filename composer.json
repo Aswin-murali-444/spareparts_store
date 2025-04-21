@@ -1,0 +1,23 @@
+{
+    "name": "aswinmurali/adbmsmic",
+    "autoload": {
+        "psr-4": {
+            "Aswinmurali\\Adbmsmic\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Aswin-murali-444",
+            "email": "aswinmurali444@gmail.com"
+        }
+    ],
+    "require": {
+        "ext-mongodb": "*",
+        "mongodb/mongodb": "^1.15"
+    },
+    "config": {
+        "platform": {
+            "ext-mongodb": "1.15.0"
+        }
+    }
+}
