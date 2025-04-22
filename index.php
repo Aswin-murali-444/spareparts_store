@@ -414,9 +414,9 @@ foreach ($products as $product) {
                         <a class="nav-link" href="index.php#contact">Contact</a>
                     </li>
                 </ul>
-                <form class="d-flex me-3">
+                <form class="d-flex me-3" id="searchForm" action="search.php" method="GET">
                     <div class="input-group">
-                        <input class="form-control me-2" type="search" placeholder="Search for parts..." aria-label="Search">
+                        <input class="form-control me-2" type="search" name="query" placeholder="Search for parts..." aria-label="Search">
                         <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </form>
