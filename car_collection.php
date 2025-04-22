@@ -17,6 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     $year = $_POST['year'];
     $variant = $_POST['variant'];
 
+    // Debugging: Print the form data
+    error_log("Brand: " . $brand);
+    error_log("Model: " . $model);
+    error_log("Year: " . $year);
+    error_log("Variant: " . $variant);
+
     try {
         // Select the 'cars' collection
         $collection = $db->cars;
@@ -63,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($updateResult->getModifiedCount() > 0) {
             $successMessage = "Car updated successfully!";
         } else {
-            $errorMessage = "Failed to update car.";
+            $errorMessage = "Failed to update car or no changes were made.";
         }
     } catch (MongoDB\Driver\Exception\Exception $e) {
         $errorMessage = "Error updating car: " . $e->getMessage();
@@ -91,7 +97,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Fetch all cars from the database
 try {
     $collection = $db->cars;
-    $cars = $collection->find([], ['sort' => ['created_at' => -1]])->toArray();
+    $cursor = $collection->find([], ['sort' => ['created_at' => -1]]);
+    $cars = [];
+    
+    // Convert MongoDB documents to standard PHP arrays
+    foreach ($cursor as $document) {
+        $cars[] = (array)$document;
+    }
+    
+    // Debugging: Log each car document
+    foreach ($cars as $car) {
+        error_log("Car document: " . print_r($car, true));
+    }
 } catch (MongoDB\Driver\Exception\Exception $e) {
     $fetchErrorMessage = "Error fetching cars: " . $e->getMessage();
     $cars = [];
@@ -282,10 +299,10 @@ try {
                                 <tbody>
                                     <?php foreach ($cars as $car): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($car['brand']); ?></td>
-                                            <td><?php echo htmlspecialchars($car['model']); ?></td>
-                                            <td><?php echo htmlspecialchars($car['year']); ?></td>
-                                            <td><?php echo htmlspecialchars($car['variant']); ?></td>
+                                            <td><?php echo isset($car['brand']) ? htmlspecialchars($car['brand']) : 'N/A'; ?></td>
+                                            <td><?php echo isset($car['model']) ? htmlspecialchars($car['model']) : 'N/A'; ?></td>
+                                            <td><?php echo isset($car['year']) ? htmlspecialchars($car['year']) : 'N/A'; ?></td>
+                                            <td><?php echo isset($car['variant']) ? htmlspecialchars($car['variant']) : 'N/A'; ?></td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editModal<?php echo htmlspecialchars((string)$car['_id']); ?>">
                                                     <i class="bi bi-pencil"></i> Edit
@@ -310,19 +327,19 @@ try {
                                                             <input type="hidden" name="car_id" value="<?php echo htmlspecialchars((string)$car['_id']); ?>">
                                                             <div class="mb-3">
                                                                 <label for="brand" class="form-label">Brand</label>
-                                                                <input type="text" class="form-control" id="brand" name="brand" value="<?php echo htmlspecialchars($car['brand']); ?>" required>
+                                                                <input type="text" class="form-control" id="brand" name="brand" value="<?php echo isset($car['brand']) ? htmlspecialchars($car['brand']) : ''; ?>" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="model" class="form-label">Model</label>
-                                                                <input type="text" class="form-control" id="model" name="model" value="<?php echo htmlspecialchars($car['model']); ?>" required>
+                                                                <input type="text" class="form-control" id="model" name="model" value="<?php echo isset($car['model']) ? htmlspecialchars($car['model']) : ''; ?>" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="year" class="form-label">Year</label>
-                                                                <input type="number" class="form-control" id="year" name="year" value="<?php echo htmlspecialchars($car['year']); ?>" required>
+                                                                <input type="number" class="form-control" id="year" name="year" value="<?php echo isset($car['year']) ? htmlspecialchars($car['year']) : ''; ?>" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="variant" class="form-label">Variant</label>
-                                                                <input type="text" class="form-control" id="variant" name="variant" value="<?php echo htmlspecialchars($car['variant']); ?>" required>
+                                                                <input type="text" class="form-control" id="variant" name="variant" value="<?php echo isset($car['variant']) ? htmlspecialchars($car['variant']) : ''; ?>" required>
                                                             </div>
                                                             <button type="submit" class="btn btn-primary">Save Changes</button>
                                                         </form>
@@ -340,7 +357,7 @@ try {
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        Are you sure you want to delete the car "<?php echo htmlspecialchars($car['brand'] . ' ' . $car['model']); ?>"?
+                                                        Are you sure you want to delete the car "<?php echo isset($car['brand']) ? htmlspecialchars($car['brand']) : 'N/A'; ?> <?php echo isset($car['model']) ? htmlspecialchars($car['model']) : 'N/A'; ?>"?
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -404,4 +421,4 @@ try {
         });
     </script>
 </body>
-</html> 
+</html>

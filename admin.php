@@ -25,7 +25,6 @@ try {
     $contact_info_collection = $db->contact_info;
     $messages = $contact_info_collection->find()->toArray();
     
-
     // Ensure each message has a 'read' field
     foreach ($messages as &$message) {
         if (!isset($message['read'])) {
@@ -35,6 +34,18 @@ try {
 } catch (MongoDB\Driver\Exception\Exception $e) {
     $messages = [];
     $errorMessage = 'Error fetching messages: ' . $e->getMessage();
+}
+
+$debugMode = false; // Set to true to enable debugging
+
+if ($debugMode) {
+    // Debugging: Print the number of messages fetched
+    echo 'Number of messages fetched: ' . count($messages); // Debugging
+
+    // Debugging: Print the $messages array
+    echo '<pre>';
+    print_r($messages); // Debugging
+    echo '</pre>';
 }
 
 // Initialize variables

@@ -1618,6 +1618,49 @@ foreach ($products as $product) {
             const partsModal = new bootstrap.Modal(document.getElementById('partsModal'));
             partsModal.show();
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch the cart count from the session
+            const cartCount = <?php echo count($_SESSION['cart'] ?? []); ?>;
+            document.getElementById('cart-count').textContent = cartCount;
+
+            // Fetch the wishlist count from the session
+            const wishlistCount = <?php echo count($_SESSION['wishlist'] ?? []); ?>;
+            document.querySelector('#wishlistModal .badge').textContent = wishlistCount;
+        });
+
+        function addToWishlist(productId) {
+            fetch('add_to_wishlist.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `product_id=${productId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Wishlist!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    // Update wishlist count
+                    const wishlistCountSpan = document.querySelector('#wishlistModal .badge');
+                    wishlistCountSpan.textContent = data.wishlistCount;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to add to wishlist',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 </body>
 </html>
