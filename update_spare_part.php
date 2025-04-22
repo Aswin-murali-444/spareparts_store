@@ -19,6 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = $_POST['category_id'];
     $compatible_cars = $_POST['compatible_cars']; // This will be an array of car IDs
 
+    // Handle image update
+    if (!empty($_FILES['image_upload']['name'])) {
+        // Handle image upload
+        $uploadDir = "uploads/"; // Create an 'uploads' directory in your project
+        $uploadFile = $uploadDir . basename($_FILES['image_upload']['name']);
+        
+        if (move_uploaded_file($_FILES['image_upload']['tmp_name'], $uploadFile)) {
+            $image = $uploadFile; // Save the file path
+        } else {
+            $errorMessage = "Error uploading image.";
+            $image = ''; // Set a default value
+        }
+    } else {
+        // If no new image is uploaded, keep the existing image
+        $spare_part = $db->spare_parts->findOne(['_id' => new MongoDB\BSON\ObjectId($id)]);
+        $image = $spare_part['image'];
+    }
+
     try {
         // Select the 'spare_parts' collection
         $collection = $db->spare_parts;
@@ -39,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'price' => (float)$price,
                     'stock' => (int)$stock,
                     'category_id' => new MongoDB\BSON\ObjectId($category_id),
-                    'compatible_cars' => $compatible_cars_object_ids
+                    'compatible_cars' => $compatible_cars_object_ids,
+                    'image' => $image
                 ]
             ]
         );

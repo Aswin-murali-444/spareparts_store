@@ -16,8 +16,8 @@ $wishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
 try {
     $cars_collection = $db->cars;
     $makes = $cars_collection->distinct('brand');
-    $models = $cars_collection->distinct('model');
-    $years = $cars_collection->distinct('year');
+    $models = array_unique($cars_collection->distinct('model')); // Ensure unique models
+    $years = array_unique($cars_collection->distinct('year')); // Ensure unique years
 } catch (MongoDB\Driver\Exception\Exception $e) {
     $fetchErrorMessage = "Error fetching data: " . $e->getMessage();
     $makes = [];
@@ -43,6 +43,16 @@ $shippingCost = 100; // Fixed shipping cost
 $taxRate = 0.10; // 10% tax rate
 $taxAmount = $subtotal * $taxRate;
 $total = $subtotal + $shippingCost + $taxAmount;
+
+// Find the latest product based on the 'created_at' timestamp
+$latestProduct = null;
+foreach ($products as $product) {
+    if (isset($product['created_at'])) {
+        if ($latestProduct === null || $product['created_at'] > $latestProduct['created_at']) {
+            $latestProduct = $product;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -148,14 +158,36 @@ $total = $subtotal + $shippingCost + $taxAmount;
             transform: scale(1.05);
         }
 
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .brand-logo-item {
+            display: inline-block;
+            margin: 0 20px; /* Add spacing between logos */
+        }
+
         .brand-logo {
-            height: 60px;
-            filter: grayscale(100%);
+            height: 80px; /* Increase the size of the logos */
+            filter: grayscale(0%); /* Ensure images are in color */
             transition: filter 0.3s;
         }
         
         .brand-logo:hover {
-            filter: grayscale(0%);
+            filter: grayscale(0%); /* Ensure images remain in color on hover */
         }
 
         .parts-finder {
@@ -194,6 +226,162 @@ $total = $subtotal + $shippingCost + $taxAmount;
 
         .navbar .dropdown-item:hover {
             background-color: #f8f9fa;
+        }
+
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .card-footer {
+            background: #f8f9fa;
+            padding: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0b5ed7;
+        }
+
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5c636a;
+            border-color: #5c636a;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.5em 0.75em;
+        }
+
+        .wishlist-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+
+        .btn-custom {
+            background-color: #ff5722; /* Example: Orange color */
+            border-color: #ff5722;
+            color: #fff;
+        }
+
+        .btn-custom:hover {
+            background-color: #e64a19; /* Darker shade for hover */
+            border-color: #e64a19;
+        }
+
+        /* Custom styles for the modal */
+        #partsModal .modal-content {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #partsModal .modal-header {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #partsModal .modal-body {
+            padding: 20px;
+        }
+
+        #partsModal .modal-footer {
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Custom styles for the spare parts cards */
+        .parts-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .parts-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .parts-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .parts-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .parts-card .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .parts-card .card-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .parts-card .card-footer {
+            background: #f8f9fa;
+            padding: 1rem;
+        }
+
+        .parts-card .btn-custom {
+            background-color: #ff5722;
+            border-color: #ff5722;
+            color: #fff;
+        }
+
+        .parts-card .btn-custom:hover {
+            background-color: #e64a19;
+            border-color: #e64a19;
         }
     </style>
 </head>
@@ -418,6 +606,35 @@ $total = $subtotal + $shippingCost + $taxAmount;
         </div>
     </div>
 
+    <!-- Enquiry Modal -->
+    <div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="enquiryModalLabel">Send Enquiry</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="enquiryForm">
+                        <div class="mb-3">
+                            <label for="enquiryName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="enquiryName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="enquiryEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="enquiryEmail" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="enquiryMessage" class="form-label">Message</label>
+                            <textarea class="form-control" id="enquiryMessage" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Enquiry</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section id="home" class="hero-section text-center text-white">
         <div class="container animate__animated animate__fadeIn">
@@ -442,13 +659,13 @@ $total = $subtotal + $shippingCost + $taxAmount;
                 <div class="col-md-10">
                     <div class="card">
                         <div class="card-body p-4">
-                            <form class="row g-3">
+                            <form class="row g-3" onsubmit="findParts(event)">
                                 <div class="col-md-4">
                                     <label for="make" class="form-label">Make</label>
-                                    <select id="make" class="form-select">
+                                    <select id="make" class="form-select" onchange="fetchModels(this.value)">
                                         <option selected>Choose...</option>
                                         <?php foreach ($makes as $make): ?>
-                                            <option><?php echo htmlspecialchars($make); ?></option>
+                                            <option value="<?php echo htmlspecialchars($make); ?>"><?php echo htmlspecialchars($make); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -456,18 +673,12 @@ $total = $subtotal + $shippingCost + $taxAmount;
                                     <label for="model" class="form-label">Model</label>
                                     <select id="model" class="form-select">
                                         <option selected>Choose...</option>
-                                        <?php foreach ($models as $model): ?>
-                                            <option><?php echo htmlspecialchars($model); ?></option>
-                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="year" class="form-label">Year</label>
                                     <select id="year" class="form-select">
                                         <option selected>Choose...</option>
-                                        <?php foreach ($years as $year): ?>
-                                            <option><?php echo htmlspecialchars($year); ?></option>
-                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-12 text-center mt-4">
@@ -581,8 +792,17 @@ $total = $subtotal + $shippingCost + $taxAmount;
                     <?php foreach ($products as $product): ?>
                         <!-- Product -->
                         <div class="col-md-4 col-lg-3 mb-4">
-                            <div class="card h-100 animate__animated animate__fadeIn">
-                                <img src="<?php echo htmlspecialchars($product['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <div class="card h-100 animate__animated animate__fadeIn shadow-sm">
+                                <?php
+                                // Check if the product is the latest one
+                                $isLatestProduct = isset($latestProduct) && $product['_id'] == $latestProduct['_id'];
+                                ?>
+                                <?php if ($isLatestProduct): ?>
+                                    <div class="position-absolute top-0 start-0 m-2">
+                                        <span class="badge bg-danger">New Arrival</span>
+                                    </div>
+                                <?php endif; ?>
+                                <img src="<?php echo htmlspecialchars($product['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>" style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
                                     <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
                                     <button type="button" class="btn btn-outline-danger btn-sm wishlist-button" data-product-id="<?php echo htmlspecialchars((string)$product['_id']); ?>">
@@ -592,13 +812,60 @@ $total = $subtotal + $shippingCost + $taxAmount;
                                         <span class="text-primary fw-bold fs-5">₹<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></span>
                                     </div>
                                     <p class="card-text"><?php echo htmlspecialchars($product['description']); ?></p>
+                                    <p class="card-text"><strong>Category:</strong> 
+                                        <?php 
+                                        if (isset($product['category_id'])) {
+                                            // Fetch the category name from the categories collection
+                                            $category = $db->categories->findOne(['_id' => new MongoDB\BSON\ObjectId($product['category_id'])]);
+                                            if ($category && isset($category['categoryName'])) {
+                                                echo htmlspecialchars($category['categoryName']);
+                                            } else {
+                                                echo 'Unknown Category'; // Handle missing 'categoryName' field
+                                            }
+                                        } else {
+                                            echo 'N/A'; // Handle missing category_id
+                                        }
+                                        ?>
+                                    </p>
+                                    <p class="card-text"><strong>Compatible Cars:</strong> 
+                                        <?php 
+                                        if (isset($product['compatible_cars'])) {
+                                            // Convert BSONArray to PHP array
+                                            $compatibleCarsArray = $product['compatible_cars']->getArrayCopy();
+                                            // Fetch car details from the cars collection
+                                            $carDetails = [];
+                                            foreach ($compatibleCarsArray as $carId) {
+                                                $car = $db->cars->findOne(['_id' => new MongoDB\BSON\ObjectId($carId)]);
+                                                if ($car) {
+                                                    $brand = isset($car['brand']) ? htmlspecialchars($car['brand']) : 'Unknown Brand';
+                                                    $model = isset($car['model']) ? htmlspecialchars($car['model']) : 'Unknown Model';
+                                                    $carDetails[] = "$brand $model"; // Combine brand and model
+                                                } else {
+                                                    $carDetails[] = 'Unknown Car'; // Handle missing car document
+                                                }
+                                            }
+                                            // Convert array to string
+                                            $compatibleCars = implode(', ', $carDetails);
+                                            echo htmlspecialchars($compatibleCars);
+                                        } else {
+                                            echo 'N/A'; // Handle missing compatible_cars
+                                        }
+                                        ?>
+                                    </p>
+                                    <p class="card-text"><strong>Stock:</strong> 
+                                        <?php if (isset($product['stock']) && $product['stock'] < 25): ?>
+                                            <span class="text-danger"><?php echo htmlspecialchars($product['stock']); ?> (Low Stock)</span>
+                                        <?php else: ?>
+                                            <?php echo isset($product['stock']) ? htmlspecialchars($product['stock']) : 'N/A'; ?>
+                                        <?php endif; ?>
+                                    </p>
                                 </div>
                                 <div class="card-footer bg-white border-0">
-                                    <form class="add-to-cart-form" data-product-id="<?php echo htmlspecialchars((string)$product['_id']); ?>">
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-primary">Add to Cart</button>
-                                        </div>
-                                    </form>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-primary" onclick="buyNow('<?php echo htmlspecialchars((string)$product['_id']); ?>')">Buy Now</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="addToCart('<?php echo htmlspecialchars((string)$product['_id']); ?>')">Add to Cart</button>
+                                        <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#enquiryModal" data-product-id="<?php echo htmlspecialchars((string)$product['_id']); ?>">Send Enquiry</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -615,24 +882,26 @@ $total = $subtotal + $shippingCost + $taxAmount;
     <section class="py-5">
         <div class="container">
             <h2 class="text-center mb-5">Top Brands We Carry</h2>
-            <div class="row align-items-center justify-content-center">
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 1" class="img-fluid brand-logo">
-                </div>
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 2" class="img-fluid brand-logo">
-                </div>
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 3" class="img-fluid brand-logo">
-                </div>
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 4" class="img-fluid brand-logo">
-                </div>
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 5" class="img-fluid brand-logo">
-                </div>
-                <div class="col-4 col-md-2 text-center mb-4">
-                    <img src="/api/placeholder/120/60" alt="Brand 6" class="img-fluid brand-logo">
+            <div class="marquee-container">
+                <div class="marquee-content">
+                    <div class="brand-logo-item">
+                        <img src="./images/1614168969-0618.avif" alt="Bosch" class="img-fluid brand-logo">
+                    </div>
+                    <div class="brand-logo-item">
+                        <img src="./images/download (1).jpg" alt="Delphi" class="img-fluid brand-logo">
+                    </div>
+                    <div class="brand-logo-item">
+                        <img src="./images/download.png" alt="Denso" class="img-fluid brand-logo">
+                    </div>
+                    <div class="brand-logo-item">
+                        <img src="../ADBMS MIC/images/download (1).png" alt="Mahle" class="img-fluid brand-logo">
+                    </div>
+                    <div class="brand-logo-item">
+                        <img src="./images/download (2).png" alt="Valeo" class="img-fluid brand-logo">
+                    </div>
+                    <div class="brand-logo-item">
+                        <img src="./images/download.jpg" alt="NGK" class="img-fluid brand-logo">
+                    </div>
                 </div>
             </div>
         </div>
@@ -762,6 +1031,12 @@ $total = $subtotal + $shippingCost + $taxAmount;
     <section id="contact" class="py-5 bg-light">
         <div class="container">
             <h2 class="text-center mb-5">Contact Us</h2>
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($_SESSION['message']); unset($_SESSION['message']); ?></div>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
             <div class="row">
                 <div class="col-md-6">
                     <h3>Get in Touch</h3>
@@ -771,21 +1046,24 @@ $total = $subtotal + $shippingCost + $taxAmount;
                         <li><strong>Phone:</strong> +1 (123) 456-7890</li>
                         <li><strong>Address:</strong> 123 Auto Spare St, City, Country</li>
                     </ul>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enquiryModal">
+                        Send Enquiry
+                    </button>
                 </div>
                 <div class="col-md-6">
                     <h3>Send Us a Message</h3>
-                    <form>
+                    <form id="contactForm">
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" required>
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="message" class="form-label">Message</label>
-                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
@@ -824,6 +1102,24 @@ $total = $subtotal + $shippingCost + $taxAmount;
             </div>
         </div>
     </footer>
+
+    <!-- Modal for Displaying Spare Parts -->
+    <div class="modal fade" id="partsModal" tabindex="-1" aria-labelledby="partsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="partsModalLabel">Compatible Spare Parts</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="partsModalBody">
+                    <!-- Spare parts will be displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -1043,6 +1339,285 @@ $total = $subtotal + $shippingCost + $taxAmount;
             cartCount = 0;
             cartCountSpan.textContent = cartCount;
         });
+
+        function buyNow(productId) {
+            // Redirect to checkout page with the product ID
+            window.location.href = `checkout.php?product_id=${productId}`;
+        }
+
+        function addToCart(productId) {
+            fetch('add_to_cart.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `product_id=${productId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    // Update cart count
+                    const cartCountSpan = document.getElementById('cart-count');
+                    cartCountSpan.textContent = data.cartCount;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to add to cart',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form data
+            const formData = new FormData(this);
+
+            // Send the form data using AJAX
+            fetch('submit_contact.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Message Sent!',
+                        text: 'Your message has been sent successfully.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    // Optionally, reset the form
+                    document.getElementById('contactForm').reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Send Message',
+                        text: data.message || 'Please try again later.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while sending your message.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            });
+        });
+
+        document.getElementById('enquiryForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form data
+            const formData = new FormData(this);
+
+            // Send the form data using AJAX
+            fetch('submit_enquiry.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Enquiry Sent!',
+                        text: 'Your enquiry has been sent successfully.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    // Optionally, reset the form
+                    document.getElementById('enquiryForm').reset();
+                    // Close the modal
+                    bootstrap.Modal.getInstance(document.getElementById('enquiryModal')).hide();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Send Enquiry',
+                        text: data.message || 'Please try again later.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while sending your enquiry.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-10px)';
+                    card.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+                });
+            });
+        });
+
+        function fetchModels(make) {
+            if (make) {
+                fetch('fetch_models.php?make=' + encodeURIComponent(make))
+                    .then(response => response.json())
+                    .then(data => {
+                        const modelSelect = document.getElementById('model');
+                        modelSelect.innerHTML = '<option selected>Choose...</option>';
+                        data.models.forEach(model => {
+                            const option = document.createElement('option');
+                            option.value = model;
+                            option.textContent = model;
+                            modelSelect.appendChild(option);
+                        });
+
+                        const yearSelect = document.getElementById('year');
+                        yearSelect.innerHTML = '<option selected>Choose...</option>';
+                        data.years.forEach(year => {
+                            const option = document.createElement('option');
+                            option.value = year;
+                            option.textContent = year;
+                            yearSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching models and years:', error));
+            } else {
+                const modelSelect = document.getElementById('model');
+                modelSelect.innerHTML = '<option selected>Choose...</option>';
+                const yearSelect = document.getElementById('year');
+                yearSelect.innerHTML = '<option selected>Choose...</option>';
+            }
+        }
+
+        function findParts(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const make = document.getElementById('make').value;
+            const model = document.getElementById('model').value;
+            const year = document.getElementById('year').value;
+
+            console.log("Make:", make); // Debugging statement
+            console.log("Model:", model); // Debugging statement
+            console.log("Year:", year); // Debugging statement
+
+            if (make && model && year) {
+                fetch('find_parts.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${encodeURIComponent(year)}`
+                })
+                .then(response => {
+                    console.log("Response received:", response); // Debugging statement
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Data received:", data); // Debugging statement
+                    if (data.success) {
+                        displayPartsInModal(data.parts);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No Parts Found',
+                            text: data.message || 'No spare parts found for the selected vehicle.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error); // Debugging statement
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching parts.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Incomplete Selection',
+                    text: 'Please select a make, model, and year.',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        }
+
+        function displayPartsInModal(parts) {
+            const partsModalBody = document.getElementById('partsModalBody');
+            let partsHTML = '<div class="row">';
+
+            if (parts.length === 0) {
+                partsHTML += '<div class="col-12"><p class="text-center">No parts found for the selected vehicle.</p></div>';
+            } else {
+                parts.forEach(part => {
+                    partsHTML += `
+                        <div class="col-md-4 col-lg-3 mb-4">
+                            <div class="card h-100 parts-card">
+                                <img src="${part.image}" class="card-img-top" alt="${part.name}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${part.name}</h5>
+                                    <button type="button" class="btn btn-outline-danger btn-sm wishlist-button" data-product-id="${part._id}">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-primary fw-bold fs-5">₹${part.price.toFixed(2)}</span>
+                                    </div>
+                                    <p class="card-text">${part.description}</p>
+                                    <p class="card-text"><strong>Category:</strong> ${part.category}</p>
+                                    <p class="card-text"><strong>Stock:</strong> ${part.stock < 25 ? `<span class="text-danger">${part.stock} (Low Stock)</span>` : part.stock}</p>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-primary" onclick="buyNow('${part._id}')">Buy Now</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="addToCart('${part._id}')">Add to Cart</button>
+                                        <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#enquiryModal" data-product-id="${part._id}">Send Enquiry</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            partsHTML += '</div>';
+            partsModalBody.innerHTML = partsHTML;
+
+            // Show the modal
+            const partsModal = new bootstrap.Modal(document.getElementById('partsModal'));
+            partsModal.show();
+        }
     </script>
 </body>
 </html>

@@ -101,7 +101,7 @@ try {
     $cars_collection = $db->cars;
     $cars = $cars_collection->find([], ['sort' => ['brand' => 1, 'model' => 1]])->toArray();
     foreach ($cars as $car) {
-        $cars_map[(string)$car['_id']] = $car['brand'] . ' ' . $car['model'];
+        $cars_map[(string)$car['_id']] = $car['brand'] . ' ' . $car['model'] . ' (' . $car['year'] . ')';
     }
 } catch (MongoDB\Driver\Exception\Exception $e) {
     $carsErrorMessage = "Error fetching cars: " . $e->getMessage();
@@ -337,7 +337,7 @@ try {
                                                     <div class="form-check">
                                                         <input class="form-check-input styled-checkbox" type="checkbox" name="compatible_cars[]" value="<?php echo htmlspecialchars((string)$car['_id']); ?>" id="car_<?php echo htmlspecialchars((string)$car['_id']); ?>">
                                                         <label class="form-check-label" for="car_<?php echo htmlspecialchars((string)$car['_id']); ?>">
-                                                            <?php echo htmlspecialchars($car['brand'] . ' ' . $car['model']); ?>
+                                                            <?php echo htmlspecialchars($car['brand'] . ' ' . $car['model'] . ' (' . $car['year'] . ')'); ?>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -472,7 +472,7 @@ try {
                                                 <div class="form-check">
                                                     <input class="form-check-input compatible-car-checkbox" type="checkbox" name="compatible_cars[]" value="<?php echo htmlspecialchars((string)$car['_id']); ?>" id="editCar_<?php echo htmlspecialchars((string)$car['_id']); ?>">
                                                     <label class="form-check-label" for="editCar_<?php echo htmlspecialchars((string)$car['_id']); ?>">
-                                                        <?php echo htmlspecialchars($car['brand'] . ' ' . $car['model']); ?>
+                                                        <?php echo htmlspecialchars($car['brand'] . ' ' . $car['model'] . ' (' . $car['year'] . ')'); ?>
                                                     </label>
                                                 </div>
                                             </div>
